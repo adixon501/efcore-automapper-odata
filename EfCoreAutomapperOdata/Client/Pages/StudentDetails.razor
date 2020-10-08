@@ -1,0 +1,47 @@
+@page "/students/{Id:int}"
+@inject HttpClient Http
+
+<h1>Student @Id</h1>
+
+@if (loading)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h3>@student.Name Friends</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var friend in student.Friends)
+            {
+                <tr>
+                    <td>@friend.Id</td>
+                    <td><a href="/students/@friend.Id">@friend.Name</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private StudentDto student = new StudentDto();
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Http.GetAsync($"odata/Students({Id})?$expand=Friends");
+        response.EnsureSuccessStatusCode();
+
+        student = Newtonsoft.Json.JsonConvert.DeserializeObject<StudentDto>(await response.Content.ReadAsStringAsync());
+        loading = false;
+    }
+
+}

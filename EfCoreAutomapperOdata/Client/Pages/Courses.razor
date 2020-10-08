@@ -1,0 +1,46 @@
+@page "/courses"
+@inject HttpClient Http
+
+<h1>Courses</h1>
+
+@if (loading)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Instructor</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var course in courses?.Values)
+            {
+                <tr>
+                    <td>@course.Id</td>
+                    <td><a href="/courses/@course.Id">@course.Name</a></td>
+                    <td><a href="/instructors/@course.Instructor.Id">@course.Instructor.Name</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private ODataResponse<CourseDto> courses = new ODataResponse<CourseDto>();
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Http.GetAsync("odata/Courses?$expand=Instructor");
+        response.EnsureSuccessStatusCode();
+
+        courses = Newtonsoft.Json.JsonConvert.DeserializeObject<ODataResponse<CourseDto>>(await response.Content.ReadAsStringAsync());
+        loading = false;
+    }
+
+}
