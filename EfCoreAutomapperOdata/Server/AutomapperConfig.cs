@@ -14,7 +14,6 @@ namespace EfCoreAutomapperOdata.Server
 
             CreateMap<Course, CourseDto>()
                 .ForMember(dto => dto.Students, opt => {
-                    //opt.ExplicitExpansion();
                     opt.MapFrom(_ => _.Students.Select(y => y.Student));
                 });
             CreateMap<CourseDto, Course>()
@@ -26,11 +25,9 @@ namespace EfCoreAutomapperOdata.Server
 
             CreateMap<Student, StudentDto>()
                 .ForMember(dto => dto.Courses, opt => {
-                    //opt.ExplicitExpansion();
                     opt.MapFrom(x => x.Courses.Select(y => y.Course));
                 })
                 .ForMember(dto => dto.Friends, opt => {
-                    //opt.ExplicitExpansion();
                     opt.MapFrom(x => x.Friends.Select(y => y.Friend));
                 });
             CreateMap<StudentDto, Student>()
